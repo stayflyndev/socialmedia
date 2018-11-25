@@ -14,8 +14,7 @@ password:
  { type : String, 
 required: true },
 avatar:
- { type : String, 
-required: true },
+ { type : String },
 date:
  { type : Date, 
 default: Date.now },
