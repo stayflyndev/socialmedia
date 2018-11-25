@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 
 // create schema.  what fields do we want?
@@ -18,7 +18,7 @@ avatar:
 required: true },
 date:
  { type : Date, 
-default: date.now },
+default: Date.now },
 
 });
 
