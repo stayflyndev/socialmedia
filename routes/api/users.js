@@ -4,6 +4,8 @@ const router = express.Router();
 const User = require ('../../models/User');
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
 
 
 // like res.send just with json
@@ -44,10 +46,13 @@ router.post('/register', (req, res) => {
             });
         }
     });
-    // api/users/login 
-    // will be returning the token
+   
   
 } );
+
+
+ //route to login api/users/login 
+// will be returning the token
 
 router.post('/login', (req, res) => {
     const email = req.body.email;
@@ -59,21 +64,35 @@ router.post('/login', (req, res) => {
     if(!user){
         return res.status(404).json({email: 'user not found'});
     }
-    // check password plain txt against hast using compare method
-    // bcrypt.compare(password, user.password)
-    // .then(isMatch => {
-    //     if(isMatch) {
-    //         res.json({msg: 'success'});
-    // } else {
-    //     return res.staus(404).json({password: "pw exists"});
-    // }
-    bcrypt.compare(password, user.password).then(isMatch => {
-        if(isMatch){
-            res.json({msg: "success"});
-        }else{
-    
 
-    return res.status(400).json({password: "incorrect pw"});
+    // checks the password is correct or not
+    bcrypt.compare(password, user.password)
+    .then(isMatch => {
+        if(isMatch){
+
+            // create payload
+            const payload ={
+                id: user.id,
+                name: user.name,
+                avater: user.avater
+            }
+
+            // send the json web token
+            jwt.sign(
+                payload, 
+                keys.secrectOrKey,
+                { expiresIn: 3600},
+                (err, token) => {
+                    res.json({
+                        success: true,
+                        token: 'Bearer ' + token
+                    })
+                }
+
+            );
+            
+        }else{
+         return res.status(400).json({password: "incorrect pw ya bissh"});
         }
     })
 })
