@@ -12,6 +12,9 @@ const passport = require('passport');
 // Load input validation 
 const validateRegistrationInput = require('../../validation/registration');
 
+const validateLoginInput = require('../../validation/login');
+
+
 
 // like res.send just with json
 // get the users
@@ -68,6 +71,13 @@ if(!isValid){
 // will be returning the token
 
 router.post('/login', (req, res) => {
+
+
+    const { errors, isValid } = validateLoginInput(req.body);
+    if(!isValid){
+        return res.status(400).json(errors);
+    }
+
     const email = req.body.email;
     const password = req.body.password;
 
@@ -75,7 +85,8 @@ router.post('/login', (req, res) => {
     User.findOne({email}).then(user => {
         // checks user
     if(!user){
-        return res.status(401).json({email: 'user not found'});
+        errors.email= 'user not found'
+        return res.status(401).json(errors);
     }
 
     // checks the password is correct or not
@@ -106,7 +117,8 @@ router.post('/login', (req, res) => {
             );
             
         }else{
-         return res.status(400).json({password: "incorrect pw ya bissh"});
+            errors.pawword ="incorrect password"
+         return res.status(400).json(errors);
         }
     });
 });
