@@ -6,6 +6,11 @@ const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
+const passport = require('passport');
+
+
+// Load input validation 
+const validateRegistrationInput = require('../../validation/registration');
 
 
 // like res.send just with json
@@ -16,9 +21,17 @@ router.get('/test', (req, res) => res.json( {msg: 'users work'} ));
 //gets the user if there is one based on the email and returns the message, if not gets the user model to create a new user
 // user is a param
 router.post('/register', (req, res) => {
+
+const { errors, isValid } = validateRegistrationInput(req.body);
+if(!isValid){
+    return res.status(400).json(errors);
+}
+
+
     User.findOne({ email: req.body.email }).then(user => {
         if(user){
-            return res.status(400).json({ email: "Email exists"});
+            errors.email = 'exits'
+            return res.status(400).json(errors);
         } else {
 
             const avatar = gravatar.url(req.body.email, {
@@ -36,7 +49,7 @@ router.post('/register', (req, res) => {
              
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(newUser.password, salt, (err, hash) => {
-                    if(err) throw err;
+                    if(err)throw err;
                     newUser.password = hash;
                     newUser
                     .save()
@@ -62,7 +75,7 @@ router.post('/login', (req, res) => {
     User.findOne({email}).then(user => {
         // checks user
     if(!user){
-        return res.status(404).json({email: 'user not found'});
+        return res.status(401).json({email: 'user not found'});
     }
 
     // checks the password is correct or not
@@ -78,6 +91,7 @@ router.post('/login', (req, res) => {
             }
 
             // send the json web token
+            // user information
             jwt.sign(
                 payload, 
                 keys.secrectOrKey,
@@ -94,8 +108,17 @@ router.post('/login', (req, res) => {
         }else{
          return res.status(400).json({password: "incorrect pw ya bissh"});
         }
-    })
-})
-})
+    });
+});
+});
+
+// jwt information
+router.get('/current', passport.authenticate('jwt', {session: false}), (req, res) => {
+     res.json({
+         name: req.user.name,
+         email: req.user.email
+     });
+}
+)
 
 module.exports = router;

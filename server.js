@@ -4,9 +4,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-users = require('./routes/api/users');
-profile = require('./routes/api/profile');
-posts = require('./routes/api/posts');
+const passport = require('passport');
+const users = require('./routes/api/users');
+const profile = require('./routes/api/profile');
+const posts = require('./routes/api/posts');
+const keys = require('./config/keys');
 
 
 const app = express();
@@ -22,10 +24,16 @@ mongoose
 .then(() => console.log('connected'))
 .catch(err => console.log(err));
 
+//passport middleware
+
+// passport config
+require('./config/passport')(passport);
+
+
+
 
 const port = process.env.PORT || 5000;
 // route homepage req/res objects as params
-app.get('/', (req, res) => res.send('coding all niggght'));
 
 // method to use the routes. anything after the route users whats specified
 // middleware code between the request and response
