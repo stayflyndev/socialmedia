@@ -1,5 +1,5 @@
 const Validator = require('validator');
-const isEmpty =require('./isEmpty');
+const isEmpty =require('./is-empty');
 
 module.exports =  function validateLoginInput(data) {
     let errors ={};
@@ -27,7 +27,6 @@ data.password = !isEmpty(data.password) ? data.password : '';
  return {
      errors,
      isValid: isEmpty(errors)
- }
-}
-// errors is an object
-
+ };
+};
+// errors is an obj
