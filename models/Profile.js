@@ -44,7 +44,7 @@ const ProfileSchema = new Schema ({
             company: { type: String, required: true
                     },
         
-            location: { type: String, required: true
+            location: { type: String
                     },
             
             from: { type: String, required: true
